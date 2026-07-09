@@ -3,7 +3,7 @@
     "short_name": "お小遣い管理",
     "start_url": "index.html",
     "display": "standalone",
-    "background_color": "#f5f5f7",
+    "background_color": "#ffffff",
     "icons": [
         {
             "src": "icon.png",
