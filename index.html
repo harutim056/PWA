@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <link rel="manifest" href="manifest.json">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500&display=swap" rel="stylesheet">
+    <title>お小遣い管理サイト</title>
+    <style>
+        h1,p,button,input,input:focus{
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+        }
+        button{
+            background-color: #0071e3;
+            color: white;
+            height: 35px;
+            width: 200px;
+            border-radius: 12px;
+        }
+        .deletebutton{
+            background-color: red;
+            color: white;
+            height: 25px;
+            width: 45px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        input{
+            width: 100%;
+            max-width: 350px;
+            height: 50px;
+
+            padding: 0 16px;
+            font-size: 16px; 
+            background-color: #ffffff;
+            border: 2px solid #d2d2d7;
+            border-radius: 12px;
+
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            box-sizing:  border-box;
+            transition: all 0.3s ease;
+        }
+        input:focus{
+            outline: none;
+            border: 2px solid #0071e3;
+            box-shadow: 0 0 12px rgba(0, 113, 227, 0.5);
+            background-color: #fff;
+        }
+        
+        .parent_box{
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+
+            align-items: center;
+            justify-items: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="parent_box"><h1>お小遣い管理サイト</h1>
+        <p>お小遣いを管理できます。内容と値段を入力して保存してください。</p>
+        <input type="text" placeholder="内容" id="content">
+        <input type="number" placeholder="値段" id="cost">
+        <button id="addbutton">保存</button>
+        <ul id="contentBox"></ul>
+        <div>
+            合計: <span id="totalView">0円</span>
+        </div>
+    </div>
+</body>
+
+<script>
+    const ContentIn = document.getElementById('content');
+    const CostIn = document.getElementById('cost');
+    const ConBox = document.getElementById('contentBox');
+    const addBtn = document.getElementById('addbutton');
+    const toView = document.getElementById('totalView');
+
+    
+
+    let ConList = [];
+
+    addBtn.addEventListener('click', () => {
+        addItem();
+    })
+
+    window.onload = function(){
+        const savedData = localStorage.getItem('myMonnyData');
+        if(savedData){
+            ConList = JSON.parse(savedData);
+            console.log("fukkatu", ConList);
+            updateListScreen();
+        }
+    }
+
+    function addItem(){
+        const text = ContentIn.value;
+        const number = CostIn.value;
+
+
+        const CostNum = parseInt(number);
+        if (ContentIn === "" || isNaN(CostNum)){
+            console.log("jioadjfoi", ContentIn.value);
+            console.log("jwiodejr", parseInt(CostIn));
+            return;
+        }
+        const newItem = {
+            content: text,
+            cost: CostNum
+        }
+
+        ConList.push(newItem);
+        saveData();
+        ContentIn.value = "";
+        CostIn.value = "";
+        updateListScreen();
+    }
+
+    function updateListScreen(){
+        ConBox.innerHTML = "";
+
+        ConList.forEach((function(item, index){
+            const li = document.createElement('li');
+            li.innerText = "内容:" + item.content + "　値段:" + item.cost + "円";
+
+            const dlbtn = document.createElement('button');
+            dlbtn.innerText = "削除"
+            dlbtn.className = "deletebutton"
+            dlbtn.addEventListener('click', () => {
+                if(confirm(item.content + "を削除しますか？")){
+                    ConList.splice(index, 1);
+                    saveData();
+                    updateListScreen();
+                }
+            })
+            li.appendChild(dlbtn);
+            ConBox.appendChild(li);
+        }))
+        let total = 0;
+        ConList.forEach(function(item){
+            total = total + item.cost;
+        });
+        toView.textContent = total + "円";
+    }
+
+    function saveData(){
+        localStorage.setItem('myMonnyData', JSON.stringify(ConList));
+    }
+    
+</script>
