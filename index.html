@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#ffffff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500&display=swap" rel="stylesheet">
@@ -28,8 +29,8 @@
             border: 2.5px solid #5f5f5f;
             transition: all 0.2s ease;
         }
-        @media (min-width: 768px) {
-            button:hover,button:active{
+        @media (hover: hover) {
+            button:hover:not(.selector-btn),button:active:not(.selector-btn){
             border: 2.5px solid rgb(220, 50, 50);
             box-shadow: 0 0 12px rgb(220, 50, 50);
             transform: scale(1.04);
@@ -43,6 +44,7 @@
             width: 45px;
             border-radius: 8px;
             font-size: 12px;
+            
         }
         .alldeletebutton{
             background-color: red;
@@ -89,10 +91,14 @@
             border-radius: 6px;
 
             overflow-y: auto;
+            list-style: none;
+            padding-left: 15px;
         }
         li{
             padding: 10px 5px;
             border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
         }
         li:last-child{
             border-bottom: none;
@@ -100,12 +106,53 @@
         body{
             padding-top: calc(40px + env(safe-area-iset-top));
         }
+        p{
+            text-align: center;
+        }
+
+        .pwa-popup{
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            background-color: #333;
+            color: #fff;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 9999;
+        }
+
+        .pwa-popup p {margin: 0 0 8px 0; font-size: 14px;}
+        .pwa-popup .desc {font-size: 12px; color: #ccc;}
+        .pwa-popup button {background: #ff4d4d; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;}
+        
+        @media (max-width: 767px) {
+            .pwa-popup.show{
+                display: block;
+            }
+        }
+        @media (display-mode: standalone){
+            .pwa-popup{
+                display: none !important;
+            }
+        }
+        @media (apple-mobile-web-app-cpable: yes) {
+            .pwa-popup{
+                display: none !important;
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="parent_box"><h1>お小遣い管理サイト</h1>
-        <p>お小遣いを管理できます。内容と値段を入力して保存してください。</p>
+        <p>お小遣いを管理できます。内容と値段を入力して保存してください。<br>
+            値段は正の数だと収入、負の数だと支出になります。
+        </p>
         <input type="text" placeholder="内容" id="content">
         <input type="number" placeholder="値段" id="cost">
         <button id="addbutton">保存</button>
@@ -114,6 +161,11 @@
             合計: <span id="totalView">0円</span>
         </div>
         <button id="alldlbtn", class="alldeletebutton">全消去</button>
+    </div>
+    <div id="pwa-popup" class="pwa-popup">
+        <p><strong>ホーム画面に追加</strong>するとアプリのように使えます。</p>
+        <p class="desc">下の共有ボタン<span class="icon">だsd</span>から「ホーム画面に追加」を選んでください。</p>
+        <button id="close-popup">閉じる</button>
     </div>
     <footer style="margin-top: 40px; font-size: 12px; color: #86868b; text-align: center;">
         &copy; 2026 Harutim056. All Rights Reserved.
@@ -126,11 +178,32 @@
     const ConBox = document.getElementById('contentBox');
     const addBtn = document.getElementById('addbutton');
     const toView = document.getElementById('totalView');
-    const alldlbtn = document.getElementById('alldlbtn')
+    const alldlbtn = document.getElementById('alldlbtn');
 
-    
+
 
     let ConList = [];
+
+    document.addEventListener("DOMContentLoaded", function(){
+        const popup = document.getElementById("pwa-popup");
+        const closeBtn = document.getElementById("close-popup");
+
+        const isMobile = /iPhone|iPod|Android/i.test(navigator.userAgent);
+
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        if(isMobile && !isStandalone){
+            if(!localStorage.getItem("pwa_popup_closed")){
+                popup.classList.add("show");
+            }
+        }
+
+        closeBtn.addEventListener("click", function(){
+            popup.classList.remove("show");
+            localStorage.setItem("pwa_popup_closed", "true");
+        })
+    })
+
+
 
     addBtn.addEventListener('click', () => {
         addItem();
@@ -162,7 +235,7 @@
 
         ConList.push(newItem);
         saveData();
-        alert(text + "で記入しました");
+        alert(text + "、" + CostNum + "円で記入しました");
         ContentIn.value = "";
         CostIn.value = "";
         updateListScreen();
@@ -182,10 +255,12 @@
         const number = CostIn.value;
         ConBox.innerHTML = "";
 
+
+
+
         ConList.forEach((function(item, index){
             const li = document.createElement('li');
             li.innerText = "内容:" + item.content + "　値段:" + item.cost + "円";
-
             const dlbtn = document.createElement('button');
             dlbtn.innerText = "削除"
             dlbtn.className = "deletebutton"
