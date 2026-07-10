@@ -7,12 +7,29 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500&display=swap" rel="stylesheet">
     <link rel="icon" href="favicon.png" type="image/png">
     <title>お小遣い管理サイト</title>
     <style>
+        :root{
+            --bg-color: #ffffff;
+            --text-color: #121212;
+        }
+        @media (prefers-color-scheme: dark){
+            :root{
+                --bg-color: #121212;
+                --text-color: #ffffff;
+            }
+        }
+
+
+
+
+
         body,button,input,ul{
             font-family: 'M PLUS Rounded 1c', sans-serif;
         }
@@ -105,6 +122,9 @@
         }
         body{
             padding-top: calc(40px + env(safe-area-iset-top));
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
         }
         p{
             text-align: center;
