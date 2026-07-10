@@ -251,7 +251,7 @@
 
         const CostNum = parseInt(number);
         if (ContentIn === "" || isNaN(CostNum)){
-            alert("内容か値段のどちらかが未記入です")
+            alert("内容か値段のどちらかが未記入です。")
             return;
         }
         const newItem = {
@@ -261,18 +261,22 @@
 
         ConList.push(newItem);
         saveData();
-        alert(text + "、" + CostNum + "円で記入しました");
+        alert(text + "、" + CostNum + "円で記録しました。");
         ContentIn.value = "";
         CostIn.value = "";
         updateListScreen();
     }
 
     alldlbtn.addEventListener('click', ()=>{
-        if(confirm("本当にすべて消去しますか？")){
+        if(ConList.length === 0){
+            alert("記録がないため、削除できません。");
+            return;
+        }
+        if(confirm("本当にすべての記録を消去しますか？")){
             ConList = [];
             saveData();
             updateListScreen();
-            alert("すべての記録を消去しました");
+            alert("すべての記録を消去しました。");
         }
     })
 
@@ -293,7 +297,7 @@
             dlbtn.addEventListener('click', () => {
                 if(confirm(item.content + "を削除しますか？")){
                     ConList.splice(index, 1);
-                    alert(item.content + "を削除しました");
+                    alert(item.content + "を削除しました。");
                     saveData();
                     updateListScreen();
                 }
