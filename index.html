@@ -169,10 +169,28 @@
             font-weight: bold;
 
         }
+        .toast{
+            position: fixed;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            font-size: 14px;
+            z-index: 9999;
+            transition: top 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .toast.show{
+            top: 20px;
+        }
     </style>
 </head>
 
 <body>
+    <div id="toast-container" class="toast"></div>
     <div class="parent_box"><h1>お小遣い管理サイト</h1>
         <p>お小遣いを管理できます。内容と値段を入力して保存してください。<br>
             値段は正の数だと収入、負の数だと支出になります。
@@ -261,7 +279,7 @@
 
         ConList.push(newItem);
         saveData();
-        alert(text + "、" + CostNum + "円で記録しました。");
+        showToast(text + "、" + CostNum + "円で記録しました。", addBtn.className);
         ContentIn.value = "";
         CostIn.value = "";
         updateListScreen();
@@ -276,7 +294,7 @@
             ConList = [];
             saveData();
             updateListScreen();
-            alert("すべての記録を消去しました。");
+            showToast("すべての記録を消去しました。", alldlbtn.className);
         }
     })
 
@@ -297,7 +315,7 @@
             dlbtn.addEventListener('click', () => {
                 if(confirm(item.content + "を削除しますか？")){
                     ConList.splice(index, 1);
-                    alert(item.content + "を削除しました。");
+                    showToast(item.content + "を削除しました。", dlbtn.className);
                     saveData();
                     updateListScreen();
                 }
@@ -316,4 +334,18 @@
         localStorage.setItem('myMonnyData', JSON.stringify(ConList));
     }
     
+    function showToast(message, clas){
+        
+        const toast = document.getElementById("toast-container");
+        toast.textContent = message;
+        if(clas.includes("delete")){
+            toast.style.backgroundColor = "red";
+        }else{
+            toast.style.backgroundColor = "#0071e3"
+        }
+        toast.classList.add("show");
+        setTimeout(() => {
+            toast.classList.remove("show");
+        }, 2000);
+    }
 </script>
