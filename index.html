@@ -171,7 +171,7 @@
         }
         .toast{
             position: fixed;
-            top: -60px;
+            top: -120px;
             left: 50%;
             transform: translateX(-50%);
             background-color: #333;
@@ -195,6 +195,7 @@
 
 <body>
     <div id="toast-container" class="toast"></div>
+    <div id="none" class="none"></div>
     <div class="parent_box"><h1>お小遣い管理サイト</h1>
         <p>お小遣いを管理できます。内容と値段を入力して保存してください。<br>
             値段は正の数だと収入、負の数だと支出になります。
@@ -202,7 +203,7 @@
         
         <input type="text" placeholder="内容" id="content">
         <input type="number" placeholder="値段" id="cost">
-        <button id="addbutton">保存</button>
+        <button id="addbutton" class="addbtn">保存</button>
         <ul id="contentBox"></ul>
         <div>
             合計: <span id="totalView">0円</span>
@@ -227,6 +228,7 @@
     const addBtn = document.getElementById('addbutton');
     const toView = document.getElementById('totalView');
     const alldlbtn = document.getElementById('alldlbtn');
+    const none = document.getElementById('none');
 
 
 
@@ -273,7 +275,7 @@
 
         const CostNum = parseInt(number);
         if (ContentIn === "" || isNaN(CostNum)){
-            alert("内容か値段のどちらかが未記入です。")
+            showToast("内容か値段のどちらかが未記入です。", none.className);
             return;
         }
         const newItem = {
@@ -291,7 +293,7 @@
 
     alldlbtn.addEventListener('click', ()=>{
         if(ConList.length === 0){
-            alert("記録がないため、削除できません。");
+            showToast("記録がないため、削除できません。", none.className);
             return;
         }
         if(confirm("本当にすべての記録を消去しますか？")){
@@ -339,17 +341,22 @@
     }
     
     function showToast(message, clas){
-        
+        let waitTime = 0;
         const toast = document.getElementById("toast-container");
         toast.textContent = message;
         if(clas.includes("delete")){
             toast.style.backgroundColor = "red";
+            waitTime = 2000;
+        }else if(clas.includes("add")){
+            toast.style.backgroundColor = "#0071e3";
+            waitTime = 2000;
         }else{
-            toast.style.backgroundColor = "#0071e3"
+            toast.style.backgroundColor = "#333";
+            waitTime = 1500;
         }
         toast.classList.add("show");
         setTimeout(() => {
             toast.classList.remove("show");
-        }, 2000);
+        }, waitTime);
     }
 </script>
