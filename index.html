@@ -222,25 +222,25 @@
 </body>
 
 <script>
-    const ContentIn = document.getElementById('content');
-    const CostIn = document.getElementById('cost');
-    const ConBox = document.getElementById('contentBox');
-    const addBtn = document.getElementById('addbutton');
-    const toView = document.getElementById('totalView');
-    const alldlbtn = document.getElementById('alldlbtn');
-    const none = document.getElementById('none');
+    var ContentIn = document.getElementById('content');
+    var CostIn = document.getElementById('cost');
+    var ConBox = document.getElementById('contentBox');
+    var addBtn = document.getElementById('addbutton');
+    var toView = document.getElementById('totalView');
+    var alldlbtn = document.getElementById('alldlbtn');
+    var none = document.getElementById('none');
 
 
 
-    let ConList = [];
+    var ConList = [];
 
     document.addEventListener("DOMContentLoaded", function(){
-        const popup = document.getElementById("pwa-popup");
-        const closeBtn = document.getElementById("close-popup");
+        var popup = document.getElementById("pwa-popup");
+        var closeBtn = document.getElementById("close-popup");
 
-        const isMobile = /iPhone|iPod|Android/i.test(navigator.userAgent);
+        var isMobile = /iPhone|iPod|Android/i.test(navigator.userAgent);
 
-        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
         if(isMobile && !isStandalone){
             if(!localStorage.getItem("pwa_popup_closed")){
                 popup.classList.add("show");
@@ -260,7 +260,7 @@
     })
 
     window.onload = function(){
-        const savedData = localStorage.getItem('myMonnyData');
+        var savedData = localStorage.getItem('myMonnyData');
         if(savedData){
             ConList = JSON.parse(savedData);
             console.log("fukkatu", ConList);
@@ -269,16 +269,16 @@
     }
 
     function addItem(){
-        const text = ContentIn.value;
-        const number = CostIn.value;
+        var text = ContentIn.value;
+        var number = CostIn.value;
 
 
-        const CostNum = parseInt(number);
+        var CostNum = parseInt(number);
         if (ContentIn === "" || isNaN(CostNum)){
             showToast("内容か値段のどちらかが未記入です。", none.className);
             return;
         }
-        const newItem = {
+        var newItem = {
             content: text,
             cost: CostNum
         }
@@ -305,17 +305,17 @@
     })
 
     function updateListScreen(){
-        const text = ContentIn.value;
-        const number = CostIn.value;
+        var text = ContentIn.value;
+        var number = CostIn.value;
         ConBox.innerHTML = "";
 
 
 
 
         ConList.forEach((function(item, index){
-            const li = document.createElement('li');
+            var li = document.createElement('li');
             li.innerText = "内容:" + item.content + "　値段:" + item.cost + "円";
-            const dlbtn = document.createElement('button');
+            var dlbtn = document.createElement('button');
             dlbtn.innerText = "削除"
             dlbtn.className = "deletebutton"
             dlbtn.addEventListener('click', () => {
@@ -329,7 +329,7 @@
             li.appendChild(dlbtn);
             ConBox.appendChild(li);
         }))
-        let total = 0;
+        var total = 0;
         ConList.forEach(function(item){
             total = total + item.cost;
         });
@@ -341,8 +341,8 @@
     }
     
     function showToast(message, clas){
-        let waitTime = 0;
-        const toast = document.getElementById("toast-container");
+        var waitTime = 0;
+        var toast = document.getElementById("toast-container");
         toast.textContent = message;
         if(clas.includes("delete")){
             toast.style.backgroundColor = "red";
