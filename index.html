@@ -48,7 +48,7 @@
             transition: all 0.2s ease;
         }
         @media (hover: hover) {
-            button:hover:not(.selector-btn),button:active:not(.selector-btn){
+            button:hover:not(:disabled){
             border: 2.5px solid rgb(220, 50, 50);
             box-shadow: 0 0 12px rgb(220, 50, 50);
             transform: scale(1.04);
@@ -71,6 +71,12 @@
             width: 200px;
             border-radius: 12px;
             transition: all 0.2s ease;
+        }
+        button:disabled{
+            background-color: #cccccc; /* 薄いグレーにする */
+            color: #666666;            /* 文字を暗くする */
+            opacity: 0.6;              /* 全体を少し半透明にする */
+            cursor: not-allowed;
         }
         input{
             width: 100%;
@@ -204,8 +210,8 @@
         </p>
         
         <input type="text" placeholder="内容" id="content">
-        <input type="number" placeholder="値段" id="cost">
-        <button id="addbutton" class="addbtn">保存</button>
+        <input type="tel" placeholder="値段" id="cost">
+        <button id="addbutton" class="addbtn" onclick="addItem()">保存</button>
         <ul id="contentBox"></ul>
         <div>
             合計: <span id="totalView">0円</span>
@@ -231,10 +237,54 @@
     var toView = document.getElementById('totalView');
     var alldlbtn = document.getElementById('alldlbtn');
     var none = document.getElementById('none');
-
-
+    
+    
 
     var ConList = [];
+
+    CostIn.addEventListener("input", function(){
+        var value = this.value;
+    
+    // 1. 数字とマイナス「-」以外の文字（+、#、*、小数点など）を完全に消去
+    value = value.replace(/[^0-9-]/g, '');
+    
+    // 2. 先頭以外にある不正なマイナスを消去
+    if (value.indexOf('-') !== -1) {
+        // 先頭がマイナスから始まっているかをチェック
+        var hasLeadingMinus = value.indexOf('-') === 0;
+        // 一旦すべてのマイナスを消す
+        value = value.replace(/-/g, '');
+        // 最初がマイナスだった場合のみ、先頭にマイナスを戻す
+        if (hasLeadingMinus) {
+            value = '-' + value;
+        }
+    }
+    
+    // 画面の入力欄を上書き
+    this.value = value;
+    })
+
+    checkCon();
+    function checkCon(){
+        var text = ContentIn.value;
+        var number = CostIn.value;
+        var CostNum = parseInt(number);
+        if (ContentIn === "" || isNaN(CostNum)){
+            addBtn.disabled = true;
+        }else{
+            addBtn.disabled = false;
+        }
+        requestAnimationFrame(checkCon);
+    }
+    checkList();
+    function checkList(){
+        if(ConList.length === 0){
+            alldlbtn.disabled = true;
+        }else{
+            alldlbtn.disabled = false;
+        }
+        requestAnimationFrame(checkList);
+    }
 
     document.addEventListener("DOMContentLoaded", function(){
         var popup = document.getElementById("pwa-popup");
@@ -255,12 +305,6 @@
         })
     })
 
-
-
-    addBtn.addEventListener('click', function() {
-        addItem();
-    })
-
     window.onload = function(){
         var savedData = localStorage.getItem('myMonnyData');
         if(savedData){
@@ -270,17 +314,15 @@
         }
     }
 
+
     function addItem(){
         var text = ContentIn.value;
         var number = CostIn.value;
-
-
         var CostNum = parseInt(number);
         if (ContentIn === "" || isNaN(CostNum)){
-            showToast("内容か値段のどちらかが未記入です。", none.className);
+            showToast("どっちか4", none.className);
             return;
         }
-
         var now = new Date;
         var month = now.getMonth() + 1;
         var date = now.getDate();
