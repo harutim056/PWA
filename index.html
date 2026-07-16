@@ -31,7 +31,7 @@
 
 
 
-        body,button,input,ul{
+        body,button,input,ul,select{
             font-family: 'M PLUS Rounded 1c', sans-serif;
         }
         footer{
@@ -58,8 +58,8 @@
         .deletebutton{
             background-color: red;
             color: white;
-            height: 25px;
-            width: 45px;
+            height: 45px;
+            width: 30px;
             border-radius: 8px;
             font-size: 12px;
             
@@ -116,11 +116,14 @@
 
             overflow-y: auto;
             list-style: none;
-            padding-left: 15px;
+            padding-left: 0px;
         }
         li{
-            padding: 10px 5px;
-            border-bottom: 1px solid #ddd;
+            margin-bottom: 0px;   /* 行と行の間のすきま */
+            padding: 8px 12px; 
+            border-bottom: #ccc solid 3px;   /* 文字のまわりの内側の余白 */
+            border-radius: 0px;   /* 角をちょっと丸くする */
+            color: white;
             display: flex;
             justify-content: space-between;
         }
@@ -198,6 +201,53 @@
             height: 1em;
             vertical-align: bottom;
         }
+        #TypeIn {
+    /* 1. スマホやブラウザ標準のダサい見た目を完全に強制解除（超重要） */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+
+             /* 2. 全体の大きさと形を整える */
+            width: 200px;           /* 画面幅いっぱいに広げる（お好みで調整） */
+            height: 50px;    /* 横に広がりすぎないように制限 */
+            padding: 12px 40px 12px 16px; /* 内側の余白（右側に矢印用の広めの隙間を作る） */
+            font-size: 16px;       /* iPhoneでタップした時に画面が勝手にズームされるのを防ぐ絶妙なサイズ */
+            border: 2px solid #e0e0e0; /* 優しい薄グレーの枠線 */
+            border-radius: 8px;    /* 角を少し丸くして今風にする */
+            background-color: #ffffff; /* 背景はクッキリ白 */
+            color: #333333;        /* 文字は少し落ち着いた黒 */
+
+            /* 4. タップした時などのアニメーションを滑らかにする */
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        #CategoryIn{
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+
+             /* 2. 全体の大きさと形を整える */
+            width: 250px;           /* 画面幅いっぱいに広げる（お好みで調整） */
+            height: 65px;      /* 横に広がりすぎないように制限 */
+            padding: 12px 40px 12px 16px; /* 内側の余白（右側に矢印用の広めの隙間を作る） */
+            font-size: 16px;       /* iPhoneでタップした時に画面が勝手にズームされるのを防ぐ絶妙なサイズ */
+            border: 2px solid #e0e0e0; /* 優しい薄グレーの枠線 */
+            border-radius: 8px;    /* 角を少し丸くして今風にする */
+            background-color: #ffffff; /* 背景はクッキリ白 */
+            color: #333333;     
+            font-size: 18px;   /* 文字は少し落ち着いた黒 */
+            /* 4. タップした時などのアニメーションを滑らかにする */
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .plus{
+            background-color: #70e000;
+            font-weight: bold;
+        }
+        .minus{
+            background-color: #e63946;
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -206,9 +256,17 @@
     <div id="none" class="none"></div>
     <div class="parent_box"><h1>お小遣い管理サイト</h1>
         <p>お小遣いを管理できます。内容と値段を入力して保存してください。<br>
-            値段は正の数だと収入、負の数だと支出になります。
+            収入（プラス）と支出（マイナス）を選択して保存してください。
         </p>
-        
+        <select id="CategoryIn">
+        </select>
+        <p>
+            <!-- 支出か収入かを選ぶボタン（またはセレクトボックス） -->
+            <select id="TypeIn" onchange="updateCategory()">
+                <option value="plus">📈 収入（プラス）</option>
+                <option value="minus">📉 支出（マイナス）</option>
+            </select>
+          </p>
         <input type="text" placeholder="内容" id="content">
         <input type="tel" placeholder="値段" id="cost">
         <button id="addbutton" class="addbtn" onclick="addItem()">保存</button>
@@ -237,8 +295,8 @@
     var toView = document.getElementById('totalView');
     var alldlbtn = document.getElementById('alldlbtn');
     var none = document.getElementById('none');
-    
-    
+    var TypeIn = document.getElementById("TypeIn");
+    var CategoryIn = document.getElementById("CategoryIn");
 
     var ConList = [];
 
@@ -246,19 +304,8 @@
         var value = this.value;
     
     // 1. 数字とマイナス「-」以外の文字（+、#、*、小数点など）を完全に消去
-    value = value.replace(/[^0-9-]/g, '');
-    
-    // 2. 先頭以外にある不正なマイナスを消去
-    if (value.indexOf('-') !== -1) {
-        // 先頭がマイナスから始まっているかをチェック
-        var hasLeadingMinus = value.indexOf('-') === 0;
-        // 一旦すべてのマイナスを消す
-        value = value.replace(/-/g, '');
-        // 最初がマイナスだった場合のみ、先頭にマイナスを戻す
-        if (hasLeadingMinus) {
-            value = '-' + value;
-        }
-    }
+    value = value.replace(/[^0-9]/g, '');
+
     
     // 画面の入力欄を上書き
     this.value = value;
@@ -287,6 +334,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", function(){
+        updateCategory();
         var popup = document.getElementById("pwa-popup");
         var closeBtn = document.getElementById("close-popup");
 
@@ -319,9 +367,8 @@
         var text = ContentIn.value;
         var number = CostIn.value;
         var CostNum = parseInt(number);
-        if (ContentIn === "" || isNaN(CostNum)){
-            showToast("どっちか4", none.className);
-            return;
+        if(TypeIn.value === "minus"){
+            CostNum = CostNum * -1;   
         }
         var now = new Date;
         var month = now.getMonth() + 1;
@@ -331,7 +378,9 @@
         var newItem = {
             content: text,
             cost: CostNum,
-            date: dateString
+            date: dateString,
+            type: TypeIn.value,
+            category: document.getElementById('CategoryIn').value 
         }
 
         ConList.push(newItem);
@@ -363,7 +412,11 @@
         ConList.forEach((function(item, index){
             var li = document.createElement('li');
             var DisplayDate = item.date ? "[" + item.date + "]":"";
-            li.innerText = DisplayDate + "内容:" + item.content + "　値段:" + item.cost + "円";
+            var DisplayCategory = item.category ? "【" + item.category + "】" : "";
+            li.innerHTML = DisplayDate + DisplayCategory +"内容:" + item.content + "<br>値段:" + item.cost + "円";
+            if (item.type) {
+                li.classList.add(item.type);
+            }
             var dlbtn = document.createElement('button');
             dlbtn.innerText = "削除"
             dlbtn.className = "deletebutton"
@@ -388,7 +441,23 @@
     function saveData(){
         localStorage.setItem('myMonnyData', JSON.stringify(ConList));
     }
-    
+
+    function updateCategory(){
+        CategoryIn.innerHTML = '';
+        var type = TypeIn.value;        
+        var categories = [];
+        if (type === 'plus') {
+            categories = ['お小遣い', 'その他収入'];
+        } else {
+            categories = ['食費', '趣味・娯楽', '日用品', '交通費', 'その他支出'];
+        }
+        categories.forEach(function(cat){
+            var option = document.createElement("option");
+            option.value = cat;
+            option.textContent = cat;
+            CategoryIn.appendChild(option);
+        })
+    }
     function showToast(message, clas){
         var waitTime = 0;
         var toast = document.getElementById("toast-container");
