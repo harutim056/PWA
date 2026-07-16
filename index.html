@@ -344,10 +344,10 @@
         var waitTime = 0;
         var toast = document.getElementById("toast-container");
         toast.textContent = message;
-        if(clas.includes("delete")){
+        if(clas.indexOf("delete") !== -1){
             toast.style.backgroundColor = "red";
             waitTime = 2000;
-        }else if(clas.includes("add")){
+        }else if(clas.indexOf("add") !== -1){
             toast.style.backgroundColor = "#0071e3";
             waitTime = 2000;
         }else{
