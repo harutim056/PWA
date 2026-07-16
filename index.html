@@ -255,7 +255,7 @@
 
 
 
-    addBtn.addEventListener('click', () => {
+    addBtn.addEventListener('click', function() {
         addItem();
     })
 
@@ -291,7 +291,7 @@
         updateListScreen();
     }
 
-    alldlbtn.addEventListener('click', ()=>{
+    alldlbtn.addEventListener('click', function(){
         if(ConList.length === 0){
             showToast("記録がないため、削除できません。", none.className);
             return;
@@ -318,7 +318,7 @@
             var dlbtn = document.createElement('button');
             dlbtn.innerText = "削除"
             dlbtn.className = "deletebutton"
-            dlbtn.addEventListener('click', () => {
+            dlbtn.addEventListener('click', function() {
                 if(confirm(item.content + "を削除しますか？")){
                     ConList.splice(index, 1);
                     showToast(item.content + "を削除しました。", dlbtn.className);
@@ -355,7 +355,7 @@
             waitTime = 1500;
         }
         toast.classList.add("show");
-        setTimeout(() => {
+        setTimeout(function() {
             toast.classList.remove("show");
         }, waitTime);
     }
