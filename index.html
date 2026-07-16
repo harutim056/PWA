@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <link rel="manifest" href="manifest.json">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="apple-touch-icon" href="icon.png">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
@@ -278,9 +279,16 @@
             showToast("内容か値段のどちらかが未記入です。", none.className);
             return;
         }
+
+        var now = new Date;
+        var month = now.getMonth() + 1;
+        var date = now.getDate();
+        var dateString = month + "月" + date + "日";
+
         var newItem = {
             content: text,
-            cost: CostNum
+            cost: CostNum,
+            date: dateString
         }
 
         ConList.push(newItem);
@@ -309,12 +317,10 @@
         var number = CostIn.value;
         ConBox.innerHTML = "";
 
-
-
-
         ConList.forEach((function(item, index){
             var li = document.createElement('li');
-            li.innerText = "内容:" + item.content + "　値段:" + item.cost + "円";
+            var DisplayDate = item.date ? "[" + item.date + "]":"";
+            li.innerText = DisplayDate + "内容:" + item.content + "　値段:" + item.cost + "円";
             var dlbtn = document.createElement('button');
             dlbtn.innerText = "削除"
             dlbtn.className = "deletebutton"
@@ -343,6 +349,7 @@
     function showToast(message, clas){
         var waitTime = 0;
         var toast = document.getElementById("toast-container");
+        toast.classList.remove("show");
         toast.textContent = message;
         if(clas.indexOf("delete") !== -1){
             toast.style.backgroundColor = "red";
@@ -354,8 +361,20 @@
             toast.style.backgroundColor = "#333";
             waitTime = 1500;
         }
-        toast.classList.add("show");
-        setTimeout(function() {
+
+        if(window.toastTimeout){
+            setTimeout(function() {
+            toast.classList.add("show");
+            }, 40);
+        }else{
+            toast.classList.add("show");
+        }
+        
+        
+        if (window.toastTimeout) {
+            clearTimeout(window.toastTimeout);
+        }
+        window.toastTimeout = setTimeout(function(){
             toast.classList.remove("show");
         }, waitTime);
     }
